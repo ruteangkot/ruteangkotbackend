@@ -1,19 +1,18 @@
 package route
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gocroot/config"
 	"github.com/gocroot/controller"
 	"github.com/gocroot/helper"
-	"github.com/gocroot/helper/atdb"
-	"github.com/gocroot/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func URL(w http.ResponseWriter, r *http.Request) {
-	SetEnv()
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Origin", "https://www.do.my.id")
+
+	config.SetEnv()
 
 	var method, path string = r.Method, r.URL.Path
 	switch {
@@ -28,15 +27,4 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	default:
 		controller.NotFound(w, r)
 	}
-}
-
-func SetEnv() {
-	if config.ErrorMongoconn != nil {
-		log.Println(config.ErrorMongoconn.Error())
-	}
-	profile, err := atdb.GetOneDoc[model.Profile](config.Mongoconn, "profile", primitive.M{})
-	if err != nil {
-		log.Println(err)
-	}
-	config.PublicKeyWhatsAuth = profile.PublicKey
 }
