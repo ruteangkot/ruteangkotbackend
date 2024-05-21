@@ -23,13 +23,13 @@ type Project struct {
 }
 
 type Userdomyikado struct {
-	ID              primitive.ObjectID `bson:"_id,omitempty"`
-	Name            string             `bson:"name"`
-	PhoneNumber     string             `bson:"phonenumber"`
-	Email           string             `bson:"email,omitempty"`
-	GithubUsername  string             `bson:"githubusername,omitempty"`
-	GitlabUsername  string             `bson:"gitlabusername,omitempty"`
-	GitHostUsername string             `bson:"githostusername,omitempty"`
+	ID              primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Name            string             `bson:"name" json:"name"`
+	PhoneNumber     string             `bson:"phonenumber" json:"phonenumber"`
+	Email           string             `bson:"email,omitempty" json:"email,omitempty"`
+	GithubUsername  string             `bson:"githubusername,omitempty" json:"githubusername,omitempty"`
+	GitlabUsername  string             `bson:"gitlabusername,omitempty" json:"gitlabusername,omitempty"`
+	GitHostUsername string             `bson:"githostusername,omitempty" json:"githostusername,omitempty"`
 }
 
 type Task struct {
