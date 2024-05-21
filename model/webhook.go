@@ -3,23 +3,23 @@ package model
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type PushReport struct {
-	ProjectID string `bson:"projectid"`
-	Username  string `bson:"username"`
-	Email     string `bson:"email,omitempty"`
-	Repo      string `bson:"repo"`
-	Ref       string `bson:"ref"`
-	Message   string `bson:"message"`
-	Modified  string `bson:"modified,omitempty"`
+	ProjectID string `bson:"projectid" json:"projectid"`
+	Username  string `bson:"username" json:"username"`
+	Email     string `bson:"email,omitempty" json:"email,omitempty"`
+	Repo      string `bson:"repo" json:"repo"`
+	Ref       string `bson:"ref" json:"ref"`
+	Message   string `bson:"message" json:"message"`
+	Modified  string `bson:"modified,omitempty" json:"modified,omitempty"`
 }
 
 type Project struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Secret      string             `bson:"secret"`
-	Name        string             `bson:"name"`
-	Description string             `bson:"description"`
-	Owner       Userdomyikado      `bson:"owner"`
-	Member      Userdomyikado      `bson:"member"`
-	Closed      bool               `bson:"closed,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Secret      string             `bson:"secret" json:"secret"`
+	Name        string             `bson:"name" json:"name"`
+	Description string             `bson:"description" json:"description"`
+	Owner       Userdomyikado      `bson:"owner" json:"owner"`
+	Member      Userdomyikado      `bson:"member" json:"member"`
+	Closed      bool               `bson:"closed,omitempty" json:"closed,omitempty"`
 }
 
 type Userdomyikado struct {
@@ -33,9 +33,9 @@ type Userdomyikado struct {
 }
 
 type Task struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"`
-	ProjectID string             `bson:"projectid"`
-	Name      string             `bson:"name"`
-	PIC       Userdomyikado      `bson:"pic"`
-	Done      bool               `bson:"done,omitempty"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	ProjectID string             `bson:"projectid" json:"projectid"`
+	Name      string             `bson:"name" json:"name"`
+	PIC       Userdomyikado      `bson:"pic" json:"pic"`
+	Done      bool               `bson:"done,omitempty" json:"done,omitempty"`
 }
