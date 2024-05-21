@@ -15,6 +15,15 @@ func GetSecretFromHeader(r *http.Request) (secret string) {
 	return
 }
 
+func GetLoginFromHeader(r *http.Request) (secret string) {
+	if r.Header.Get("login") != "" {
+		secret = r.Header.Get("login")
+	} else if r.Header.Get("Login") != "" {
+		secret = r.Header.Get("Login")
+	}
+	return
+}
+
 func Jsonstr(strc interface{}) string {
 	jsonData, err := json.Marshal(strc)
 	if err != nil {
