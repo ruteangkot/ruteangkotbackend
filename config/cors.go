@@ -10,7 +10,7 @@ var Origins = []string{
 	"https://dias.ulbi.ac.id",
 	"https://iteung.ulbi.ac.id",
 	"https://whatsauth.github.io",
-	"https://pmb.ulbi.ac.id",
+	"https://www.do.my.id",
 }
 
 var Headers = []string{
