@@ -9,10 +9,20 @@ import (
 )
 
 func URL(w http.ResponseWriter, r *http.Request) {
+	config.SetEnv()
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Authorization")
+		w.Header().Set("Access-Control-Allow-Methods", "POST,GET")
+		w.Header().Set("Access-Control-Allow-Origin", "https://www.do.my.id")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	// Set CORS headers for the main request.
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Origin", "https://www.do.my.id")
-
-	config.SetEnv()
 
 	var method, path string = r.Method, r.URL.Path
 	switch {
