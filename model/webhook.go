@@ -14,10 +14,12 @@ type PushReport struct {
 
 type Project struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Secret      string             `bson:"secret"`
 	Name        string             `bson:"name"`
 	Description string             `bson:"description"`
 	Owner       Userdomyikado      `bson:"owner"`
 	Member      Userdomyikado      `bson:"member"`
+	Closed      bool               `bson:"closed,omitempty"`
 }
 
 type Userdomyikado struct {
