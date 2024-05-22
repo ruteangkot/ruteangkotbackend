@@ -9,7 +9,7 @@ import (
 )
 
 func URL(w http.ResponseWriter, r *http.Request) {
-	if SetAccessControlHeaders(w, r) {
+	if config.SetAccessControlHeaders(w, r) {
 		// If it's a preflight request, return early.
 		return
 	}
@@ -28,21 +28,4 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	default:
 		controller.NotFound(w, r)
 	}
-}
-
-func SetAccessControlHeaders(w http.ResponseWriter, r *http.Request) bool {
-	// Set CORS headers for the preflight request
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Headers", "Login")
-		w.Header().Set("Access-Control-Allow-Methods", "POST,GET")
-		w.Header().Set("Access-Control-Allow-Origin", "https://www.do.my.id")
-		w.Header().Set("Access-Control-Max-Age", "3600")
-		w.WriteHeader(http.StatusNoContent)
-		return true
-	}
-	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Origin", "https://www.do.my.id")
-	return false
 }
