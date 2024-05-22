@@ -23,6 +23,6 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		httpstatus = http.StatusNotFound
 	}
-	docuser.Name = payload.Alias
+	docuser.Name = "payload.Alias"
 	helper.WriteResponse(respw, httpstatus, docuser)
 }
