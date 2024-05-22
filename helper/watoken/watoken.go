@@ -8,11 +8,12 @@ import (
 )
 
 type Payload[T any] struct {
-	Id   string    `json:"id"`
-	Exp  time.Time `json:"exp"`
-	Iat  time.Time `json:"iat"`
-	Nbf  time.Time `json:"nbf"`
-	Data T         `json:"data"`
+	Id    string    `json:"id"`
+	Alias string    `json:"alias"`
+	Exp   time.Time `json:"exp"`
+	Iat   time.Time `json:"iat"`
+	Nbf   time.Time `json:"nbf"`
+	Data  T         `json:"data"`
 }
 
 func GenerateKey() (privateKey, publicKey string) {
