@@ -17,7 +17,12 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	httpstatus := http.StatusUnauthorized
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetSecretFromHeader(req))
 	if err != nil {
-		helper.WriteString(respw, http.StatusOK, "{\"error\":\""+err.Error()+"\"}")
+		var respn model.Response
+		respn.Status = "watoken.Decode"
+		respn.Info = helper.GetSecretFromHeader(req)
+		respn.Location = config.PublicKeyWhatsAuth
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusOK, respn)
 		return
 	}
 	docuser, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
