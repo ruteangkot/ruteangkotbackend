@@ -17,14 +17,18 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	httpstatus := http.StatusUnauthorized
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetSecretFromHeader(req))
 	if err == nil {
-		httpstatus = http.StatusOK
+		docuser.Email = "Login tidak valid"
+		helper.WriteResponse(respw, http.StatusOK, docuser)
+		return
 	}
 	docuser, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
 	if err != nil {
-		httpstatus = http.StatusNotFound
+		docuser.PhoneNumber = payload.Id
+		docuser.Name = payload.Alias
+		docuser.Email = "Tidak ada di database"
+		helper.WriteResponse(respw, http.StatusNotFound, docuser)
+		return
 	}
-	docuser.PhoneNumber = payload.Id
-	docuser.Name = payload.Alias
-	docuser.Email = "payload.Alias"
+	docuser.Email = "ada di database"
 	helper.WriteResponse(respw, httpstatus, docuser)
 }
