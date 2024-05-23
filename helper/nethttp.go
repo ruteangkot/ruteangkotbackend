@@ -39,7 +39,6 @@ func WriteJSON(respw http.ResponseWriter, statusCode int, content interface{}) {
 }
 
 func WriteString(respw http.ResponseWriter, statusCode int, content string) {
-	respw.Header().Set("Content-Type", "application/json")
 	respw.WriteHeader(statusCode)
 	respw.Write([]byte(content))
 }

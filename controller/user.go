@@ -58,8 +58,15 @@ func PostDataUser(respw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		usr.PhoneNumber = payload.Id
 		usr.Name = payload.Alias
-		atdb.InsertOneDoc(config.Mongoconn, "user", usr)
-		helper.WriteJSON(respw, http.StatusNotFound, usr)
+		_, err := atdb.InsertOneDoc(config.Mongoconn, "user", usr)
+		if err != nil {
+			var respn model.Response
+			respn.Status = "Gagal Insert Database"
+			respn.Response = err.Error()
+			helper.WriteJSON(respw, http.StatusNotModified, respn)
+			return
+		}
+		helper.WriteJSON(respw, http.StatusOK, usr)
 		return
 	}
 	docuser.Email = usr.Email
