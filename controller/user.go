@@ -16,16 +16,15 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	var docuser model.Userdomyikado
 	httpstatus := http.StatusUnauthorized
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetSecretFromHeader(req))
-	if err == nil {
-		docuser.Email = "Login tidak valid"
-		helper.WriteJSON(respw, http.StatusOK, docuser)
+	if err != nil {
+		helper.WriteString(respw, http.StatusOK, "{\"error\":\""+err.Error()+"\"}")
 		return
 	}
 	docuser, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
 	if err != nil {
 		docuser.PhoneNumber = payload.Id
 		docuser.Name = payload.Alias
-		docuser.Email = "Tidak ada di database"
+		docuser.Email = err.Error()
 		helper.WriteJSON(respw, http.StatusNotFound, docuser)
 		return
 	}
