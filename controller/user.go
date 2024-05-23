@@ -15,7 +15,7 @@ import (
 func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	var docuser model.Userdomyikado
 	httpstatus := http.StatusUnauthorized
-	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetSecretFromHeader(req))
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetLoginFromHeader(req))
 	if err != nil {
 		var respn model.Response
 		respn.Status = "Error : watoken.Decode"
