@@ -13,8 +13,6 @@ import (
 )
 
 func GetDataUser(respw http.ResponseWriter, req *http.Request) {
-	var docuser model.Userdomyikado
-	httpstatus := http.StatusUnauthorized
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetLoginFromHeader(req))
 	if err != nil {
 		var respn model.Response
@@ -22,15 +20,15 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 		respn.Info = helper.GetSecretFromHeader(req)
 		respn.Location = "Decode Token Error"
 		respn.Response = err.Error()
-		helper.WriteJSON(respw, http.StatusOK, respn)
+		helper.WriteJSON(respw, http.StatusForbidden, respn)
 		return
 	}
-	docuser, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
 	if err != nil {
 		docuser.PhoneNumber = payload.Id
 		docuser.Name = payload.Alias
 		helper.WriteJSON(respw, http.StatusNotFound, docuser)
 		return
 	}
-	helper.WriteJSON(respw, httpstatus, docuser)
+	helper.WriteJSON(respw, http.StatusOK, docuser)
 }
