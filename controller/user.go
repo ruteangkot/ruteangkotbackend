@@ -18,9 +18,9 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetLoginFromHeader(req))
 	if err != nil {
 		var respn model.Response
-		respn.Status = "Error : watoken.Decode"
+		respn.Status = "Error : Token Tidak Valid"
 		respn.Info = helper.GetSecretFromHeader(req)
-		respn.Location = config.PublicKeyWhatsAuth
+		respn.Location = "Decode Token Error"
 		respn.Response = err.Error()
 		helper.WriteJSON(respw, http.StatusOK, respn)
 		return
@@ -29,10 +29,8 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		docuser.PhoneNumber = payload.Id
 		docuser.Name = payload.Alias
-		docuser.Email = err.Error()
 		helper.WriteJSON(respw, http.StatusNotFound, docuser)
 		return
 	}
-	docuser.Email = "ada di database"
 	helper.WriteJSON(respw, httpstatus, docuser)
 }
