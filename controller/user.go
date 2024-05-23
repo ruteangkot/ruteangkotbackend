@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gocroot/config"
@@ -30,5 +31,41 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 		helper.WriteJSON(respw, http.StatusNotFound, docuser)
 		return
 	}
+	helper.WriteJSON(respw, http.StatusOK, docuser)
+}
+
+func PostDataUser(respw http.ResponseWriter, req *http.Request) {
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetLoginFromHeader(req))
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = helper.GetSecretFromHeader(req)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+	var usr model.Userdomyikado
+	err = json.NewDecoder(req.Body).Decode(&usr)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Body tidak valid"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		usr.PhoneNumber = payload.Id
+		usr.Name = payload.Alias
+		atdb.InsertOneDoc(config.Mongoconn, "user", usr)
+		helper.WriteJSON(respw, http.StatusNotFound, usr)
+		return
+	}
+	docuser.Email = usr.Email
+	docuser.GitHostUsername = usr.GitHostUsername
+	docuser.GitlabUsername = usr.GitlabUsername
+	docuser.GithubUsername = usr.GithubUsername
+	atdb.ReplaceOneDoc(config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id}, docuser)
 	helper.WriteJSON(respw, http.StatusOK, docuser)
 }

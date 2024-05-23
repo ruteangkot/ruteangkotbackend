@@ -23,6 +23,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.GetNewToken(w, r)
 	case method == "GET" && path == "/data/user":
 		controller.GetDataUser(w, r)
+	case method == "POST" && path == "/data/user":
+		controller.PostDataUser(w, r)
 	case method == "POST" && helper.URLParam(path, "/webhook/nomor/:nomorwa"):
 		controller.PostInboxNomor(w, r)
 	default:
