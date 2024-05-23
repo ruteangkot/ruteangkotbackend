@@ -18,7 +18,7 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetSecretFromHeader(req))
 	if err != nil {
 		var respn model.Response
-		respn.Status = "watoken.Decode"
+		respn.Status = "Error : watoken.Decode"
 		respn.Info = helper.GetSecretFromHeader(req)
 		respn.Location = config.PublicKeyWhatsAuth
 		respn.Response = err.Error()
