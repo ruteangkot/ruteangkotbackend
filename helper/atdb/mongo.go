@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -106,12 +107,12 @@ func GetOneLatestDoc[T any](db *mongo.Database, collection string, filter bson.M
 	return
 }
 
-func InsertOneDoc(db *mongo.Database, collection string, doc interface{}) (insertedID interface{}, err error) {
+func InsertOneDoc(db *mongo.Database, collection string, doc interface{}) (insertedID primitive.ObjectID, err error) {
 	insertResult, err := db.Collection(collection).InsertOne(context.TODO(), doc)
 	if err != nil {
 		return
 	}
-	return insertResult.InsertedID, nil
+	return insertResult.InsertedID.(primitive.ObjectID), nil
 }
 
 // With replaceOne() you can only replace the entire document,
