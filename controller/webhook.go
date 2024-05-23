@@ -58,5 +58,5 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 			httpstatus = http.StatusUnauthorized
 		}
 	}
-	helper.WriteResponse(respw, httpstatus, resp)
+	helper.WriteJSON(respw, httpstatus, resp)
 }

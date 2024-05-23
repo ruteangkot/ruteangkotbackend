@@ -32,8 +32,14 @@ func Jsonstr(strc interface{}) string {
 	return string(jsonData)
 }
 
-func WriteResponse(respw http.ResponseWriter, statusCode int, responseStruct interface{}) {
+func WriteJSON(respw http.ResponseWriter, statusCode int, content interface{}) {
 	respw.Header().Set("Content-Type", "application/json")
 	respw.WriteHeader(statusCode)
-	respw.Write([]byte(Jsonstr(responseStruct)))
+	respw.Write([]byte(Jsonstr(content)))
+}
+
+func WriteString(respw http.ResponseWriter, statusCode int, content string) {
+	respw.Header().Set("Content-Type", "application/json")
+	respw.WriteHeader(statusCode)
+	respw.Write([]byte(content))
 }

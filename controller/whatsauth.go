@@ -12,7 +12,7 @@ import (
 func GetHome(respw http.ResponseWriter, req *http.Request) {
 	var resp model.Response
 	resp.Response = helper.GetIPaddress()
-	helper.WriteResponse(respw, http.StatusOK, resp)
+	helper.WriteJSON(respw, http.StatusOK, resp)
 }
 
 func PostInboxNomor(respw http.ResponseWriter, req *http.Request) {
@@ -37,7 +37,7 @@ func PostInboxNomor(respw http.ResponseWriter, req *http.Request) {
 			}
 		}
 	}
-	helper.WriteResponse(respw, httpstatus, resp)
+	helper.WriteJSON(respw, httpstatus, resp)
 }
 
 func GetNewToken(respw http.ResponseWriter, req *http.Request) {
@@ -64,11 +64,11 @@ func GetNewToken(respw http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	helper.WriteResponse(respw, httpstatus, resp)
+	helper.WriteJSON(respw, httpstatus, resp)
 }
 
 func NotFound(respw http.ResponseWriter, req *http.Request) {
 	var resp model.Response
 	resp.Response = "Not Found"
-	helper.WriteResponse(respw, http.StatusNotFound, resp)
+	helper.WriteJSON(respw, http.StatusNotFound, resp)
 }

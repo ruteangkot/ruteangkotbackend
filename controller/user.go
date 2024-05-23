@@ -18,7 +18,7 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetSecretFromHeader(req))
 	if err == nil {
 		docuser.Email = "Login tidak valid"
-		helper.WriteResponse(respw, http.StatusOK, docuser)
+		helper.WriteJSON(respw, http.StatusOK, docuser)
 		return
 	}
 	docuser, err = atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
@@ -26,9 +26,9 @@ func GetDataUser(respw http.ResponseWriter, req *http.Request) {
 		docuser.PhoneNumber = payload.Id
 		docuser.Name = payload.Alias
 		docuser.Email = "Tidak ada di database"
-		helper.WriteResponse(respw, http.StatusNotFound, docuser)
+		helper.WriteJSON(respw, http.StatusNotFound, docuser)
 		return
 	}
 	docuser.Email = "ada di database"
-	helper.WriteResponse(respw, httpstatus, docuser)
+	helper.WriteJSON(respw, httpstatus, docuser)
 }
