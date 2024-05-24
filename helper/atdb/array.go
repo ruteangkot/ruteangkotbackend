@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func AddDocToArray[T any](collection *mongo.Collection, ObjectID primitive.ObjectID, arrayname string, newDoc T) (result *mongo.UpdateResult, err error) {
+func AddDocToArray[T any](db *mongo.Database, collection string, ObjectID primitive.ObjectID, arrayname string, newDoc T) (result *mongo.UpdateResult, err error) {
 	filter := bson.M{"_id": ObjectID}
 	update := bson.M{
 		"$push": bson.M{arrayname: newDoc},
@@ -18,14 +18,14 @@ func AddDocToArray[T any](collection *mongo.Collection, ObjectID primitive.Objec
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result, err = collection.UpdateOne(ctx, filter, update)
+	result, err = db.Collection(collection).UpdateOne(ctx, filter, update)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func DeleteDocFromArray[T any](collection *mongo.Collection, ObjectID primitive.ObjectID, arrayname string, Doc T) (result *mongo.UpdateResult, err error) {
+func DeleteDocFromArray[T any](db *mongo.Database, collection string, ObjectID primitive.ObjectID, arrayname string, Doc T) (result *mongo.UpdateResult, err error) {
 	filter := bson.M{"_id": ObjectID}
 	update := bson.M{
 		"$pull": bson.M{arrayname: Doc},
@@ -34,7 +34,7 @@ func DeleteDocFromArray[T any](collection *mongo.Collection, ObjectID primitive.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result, err = collection.UpdateOne(ctx, filter, update)
+	result, err = db.Collection(collection).UpdateOne(ctx, filter, update)
 	if err != nil {
 		return
 	}
