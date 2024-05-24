@@ -56,6 +56,14 @@ func PostDataProject(respw http.ResponseWriter, req *http.Request) {
 			return
 		}
 		prj.ID = idprj
+		_, err = atdb.AddDocToArray[model.Userdomyikado](config.Mongoconn.Collection("project"), prj.ID, "members", docuser)
+		if err != nil {
+			var respn model.Response
+			respn.Status = "Gagal Menambahkan member ke proyek"
+			respn.Response = err.Error()
+			helper.WriteJSON(respw, http.StatusNotExtended, respn)
+			return
+		}
 		helper.WriteJSON(respw, http.StatusOK, prj)
 	} else {
 		var respn model.Response

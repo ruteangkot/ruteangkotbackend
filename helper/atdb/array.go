@@ -9,12 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func AddDocToArray[T any](collection *mongo.Collection, ID string, arrayname string, newDoc T) (result *mongo.UpdateResult, err error) {
-	ObjectID, err := primitive.ObjectIDFromHex(ID)
-	if err != nil {
-		return
-	}
-
+func AddDocToArray[T any](collection *mongo.Collection, ObjectID primitive.ObjectID, arrayname string, newDoc T) (result *mongo.UpdateResult, err error) {
 	filter := bson.M{"_id": ObjectID}
 	update := bson.M{
 		"$push": bson.M{arrayname: newDoc},
@@ -30,12 +25,7 @@ func AddDocToArray[T any](collection *mongo.Collection, ID string, arrayname str
 	return
 }
 
-func DeleteDocFromArray[T any](collection *mongo.Collection, ID string, arrayname string, Doc T) (result *mongo.UpdateResult, err error) {
-	ObjectID, err := primitive.ObjectIDFromHex(ID)
-	if err != nil {
-		return
-	}
-
+func DeleteDocFromArray[T any](collection *mongo.Collection, ObjectID primitive.ObjectID, arrayname string, Doc T) (result *mongo.UpdateResult, err error) {
 	filter := bson.M{"_id": ObjectID}
 	update := bson.M{
 		"$pull": bson.M{arrayname: Doc},
