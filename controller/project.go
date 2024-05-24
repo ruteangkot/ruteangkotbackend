@@ -10,6 +10,7 @@ import (
 
 	"github.com/gocroot/helper"
 	"github.com/gocroot/helper/atdb"
+	"github.com/gocroot/helper/normalize"
 	"github.com/gocroot/helper/watoken"
 )
 
@@ -43,14 +44,25 @@ func PostDataProject(respw http.ResponseWriter, req *http.Request) {
 	}
 	prj.Owner = docuser
 	prj.Secret = watoken.RandomString(48)
-	idprj, err := atdb.InsertOneDoc(config.Mongoconn, "project", prj)
+	prj.Name = normalize.SetIntoID(prj.Name)
+	existingprj, err := atdb.GetOneDoc[model.Project](config.Mongoconn, "project", primitive.M{"name": prj.Name})
 	if err != nil {
+		idprj, err := atdb.InsertOneDoc(config.Mongoconn, "project", prj)
+		if err != nil {
+			var respn model.Response
+			respn.Status = "Gagal Insert Database"
+			respn.Response = err.Error()
+			helper.WriteJSON(respw, http.StatusNotModified, respn)
+			return
+		}
+		prj.ID = idprj
+		helper.WriteJSON(respw, http.StatusOK, prj)
+	} else {
 		var respn model.Response
-		respn.Status = "Gagal Insert Database"
-		respn.Response = err.Error()
-		helper.WriteJSON(respw, http.StatusNotModified, respn)
+		respn.Status = "Error : Nama Project sudah ada"
+		respn.Response = existingprj.Name
+		helper.WriteJSON(respw, http.StatusConflict, respn)
 		return
 	}
-	prj.ID = idprj
-	helper.WriteJSON(respw, http.StatusOK, prj)
+
 }
