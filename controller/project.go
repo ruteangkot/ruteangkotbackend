@@ -42,7 +42,7 @@ func PostDataProject(respw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	prj.Owner = docuser
-	prj.Secret = watoken.RandomString(14)
+	prj.Secret = watoken.RandomString(48)
 	idprj, err := atdb.InsertOneDoc(config.Mongoconn, "project", prj)
 	if err != nil {
 		var respn model.Response
