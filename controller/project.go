@@ -35,19 +35,22 @@ func PostDataProject(respw http.ResponseWriter, req *http.Request) {
 	}
 	docuser, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
 	if err != nil {
-		prj.Owner = docuser
-		prj.Secret = watoken.RandomString(14)
-		idprj, err := atdb.InsertOneDoc(config.Mongoconn, "project", prj)
-		if err != nil {
-			var respn model.Response
-			respn.Status = "Gagal Insert Database"
-			respn.Response = err.Error()
-			helper.WriteJSON(respw, http.StatusNotModified, respn)
-			return
-		}
-		prj.ID = idprj
-		helper.WriteJSON(respw, http.StatusOK, prj)
+		var respn model.Response
+		respn.Status = "Error : Data user tidak di temukan"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
 		return
 	}
-	helper.WriteJSON(respw, http.StatusNotImplemented, prj)
+	prj.Owner = docuser
+	prj.Secret = watoken.RandomString(14)
+	idprj, err := atdb.InsertOneDoc(config.Mongoconn, "project", prj)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Gagal Insert Database"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotModified, respn)
+		return
+	}
+	prj.ID = idprj
+	helper.WriteJSON(respw, http.StatusOK, prj)
 }
