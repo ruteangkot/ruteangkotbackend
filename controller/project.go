@@ -102,5 +102,12 @@ func GetDataProject(respw http.ResponseWriter, req *http.Request) {
 		helper.WriteJSON(respw, http.StatusNotFound, respn)
 		return
 	}
+	if len(existingprjs) == 0 {
+		var respn model.Response
+		respn.Status = "Error : Data project tidak di temukan"
+		respn.Response = "Kakak belum input proyek, silahkan input dulu ya"
+		helper.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
 	helper.WriteJSON(respw, http.StatusOK, existingprjs)
 }
