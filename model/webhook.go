@@ -5,6 +5,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type PushReport struct {
 	ProjectName string             `bson:"projectname" json:"projectname"`
 	ProjectID   primitive.ObjectID `bson:"projectid" json:"projectid"`
+	UserID      primitive.ObjectID `bson:"userid,omitempty" json:"userid,omitempty"`
 	Username    string             `bson:"username" json:"username"`
 	Email       string             `bson:"email,omitempty" json:"email,omitempty"`
 	Repo        string             `bson:"repo" json:"repo"`

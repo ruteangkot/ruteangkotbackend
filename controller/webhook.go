@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,16 +43,28 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 		for i, komit := range pyl.Commits {
 			kommsg := strings.TrimSpace(komit.Message)
 			appd := strconv.Itoa(i+1) + ". " + kommsg + "\n_" + komit.Author.Name + "_\n"
+			var member *model.Userdomyikado
+			member, err := getMembersByGithubUsernameInProject(prj, komit.Author.Username)
+			if err != nil {
+				member, err = getMembersByEmailInProject(prj, komit.Author.Email)
+				if err != nil {
+					resp.Info = "Username dan Email di GitHub tidak terdaftar"
+					resp.Response = err.Error()
+					helper.WriteJSON(respw, http.StatusLocked, resp)
+					return
+				}
+			}
 			dokcommit := model.PushReport{
 				ProjectName: prj.Name,
 				ProjectID:   prj.ID,
+				UserID:      member.ID,
 				Username:    komit.Author.Username,
 				Email:       komit.Author.Email,
 				Repo:        pyl.Repository.URL,
 				Ref:         pyl.Ref,
 				Message:     kommsg,
 			}
-			_, err := atdb.InsertOneDoc(config.Mongoconn, "pushrepo", dokcommit)
+			_, err = atdb.InsertOneDoc(config.Mongoconn, "pushrepo", dokcommit)
 			if err != nil {
 				resp.Info = "Tidak masuk ke database"
 				resp.Response = err.Error()
@@ -79,4 +92,23 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 		}
 	}
 	helper.WriteJSON(respw, http.StatusOK, resp)
+}
+
+func getMembersByEmailInProject(project model.Project, email string) (*model.Userdomyikado, error) {
+	for _, member := range project.Members {
+		if member.Email == email {
+			return &member, nil
+		}
+	}
+	return nil, errors.New("member not found")
+
+}
+
+func getMembersByGithubUsernameInProject(project model.Project, githubusername string) (*model.Userdomyikado, error) {
+	for _, member := range project.Members {
+		if member.GithubUsername == githubusername {
+			return &member, nil
+		}
+	}
+	return nil, errors.New("member not found")
 }
