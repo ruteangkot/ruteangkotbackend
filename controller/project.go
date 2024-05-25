@@ -142,7 +142,7 @@ func GetDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 	if len(existingprjs) == 0 {
 		var respn model.Response
 		respn.Status = "Error : Data project tidak di temukan"
-		respn.Response = "Kakak belum input proyek, silahkan input dulu ya"
+		respn.Response = "Kakak belum menjadi anggota proyek manapun"
 		helper.WriteJSON(respw, http.StatusNotFound, respn)
 		return
 	}
