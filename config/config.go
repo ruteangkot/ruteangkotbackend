@@ -11,6 +11,8 @@ import (
 
 var IPPort, Net = helper.GetAddress()
 
+var PhoneNumber string
+
 func SetEnv() {
 	if ErrorMongoconn != nil {
 		log.Println(ErrorMongoconn.Error())
@@ -20,4 +22,5 @@ func SetEnv() {
 		log.Println(err)
 	}
 	PublicKeyWhatsAuth = profile.PublicKey
+	WAAPIToken = profile.Token
 }

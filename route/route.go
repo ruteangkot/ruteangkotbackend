@@ -33,6 +33,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.PostDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek":
 		controller.PostDataProject(w, r)
+	case method == "POST" && helper.URLParam(path, "/webhook/github/:proyek"):
+		controller.PostWebHookGithub(w, r)
 	case method == "POST" && helper.URLParam(path, "/webhook/nomor/:nomorwa"):
 		controller.PostInboxNomor(w, r)
 	default:
