@@ -43,27 +43,31 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 		for i, komit := range pyl.Commits {
 			kommsg := strings.TrimSpace(komit.Message)
 			appd := strconv.Itoa(i+1) + ". " + kommsg + "\n_" + komit.Author.Name + "_\n"
-			var member *model.Userdomyikado
-			member, err := getMemberByAttributeInProject(prj, "githubusername", komit.Author.Username)
-			if err != nil {
-				member, err = getMemberByAttributeInProject(prj, "email", komit.Author.Email)
-				if err != nil {
-					resp.Location = komit.Author.Email + " | " + komit.Author.Username
-					resp.Info = "Username dan Email di GitHub tidak terdaftar"
-					resp.Response = err.Error()
-					helper.WriteJSON(respw, http.StatusLocked, resp)
-					return
-				}
-			}
 			dokcommit := model.PushReport{
 				ProjectName: prj.Name,
 				ProjectID:   prj.ID,
-				UserID:      member.ID,
 				Username:    komit.Author.Username,
 				Email:       komit.Author.Email,
 				Repo:        pyl.Repository.URL,
 				Ref:         pyl.Ref,
 				Message:     kommsg,
+			}
+			if (prj.Owner.Email == komit.Author.Email) || (prj.Owner.GithubUsername == komit.Author.Username) {
+				dokcommit.UserID = prj.Owner.ID
+			} else {
+				var member *model.Userdomyikado
+				member, err := getMemberByAttributeInProject(prj, "githubusername", komit.Author.Username)
+				if err != nil {
+					member, err = getMemberByAttributeInProject(prj, "email", komit.Author.Email)
+					if err != nil {
+						resp.Location = komit.Author.Email + " | " + komit.Author.Username
+						resp.Info = "Username dan Email di GitHub tidak terdaftar"
+						resp.Response = err.Error()
+						helper.WriteJSON(respw, http.StatusLocked, resp)
+						return
+					}
+				}
+				dokcommit.UserID = member.ID
 			}
 			_, err = atdb.InsertOneDoc(config.Mongoconn, "pushrepo", dokcommit)
 			if err != nil {
