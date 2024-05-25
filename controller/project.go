@@ -148,3 +148,65 @@ func GetDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 	}
 	helper.WriteJSON(respw, http.StatusOK, existingprjs)
 }
+
+func PostDataMemberProject(respw http.ResponseWriter, req *http.Request) {
+	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetLoginFromHeader(req))
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Token Tidak Valid"
+		respn.Info = helper.GetSecretFromHeader(req)
+		respn.Location = "Decode Token Error"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusForbidden, respn)
+		return
+	}
+	var idprjuser model.Userdomyikado
+	err = json.NewDecoder(req.Body).Decode(&idprjuser)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Body tidak valid"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+	docuserowner, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": payload.Id})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data owner tidak di temukan"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+	existingprj, err := atdb.GetOneDoc[[]model.Project](config.Mongoconn, "project", primitive.M{"_id": idprjuser.ID, "owner._id": docuserowner.ID})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data project tidak di temukan"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
+	if len(existingprj) == 0 {
+		var respn model.Response
+		respn.Status = "Error : Data project tidak di temukan"
+		respn.Response = "Kakak belum input proyek, silahkan input dulu ya"
+		helper.WriteJSON(respw, http.StatusNotFound, respn)
+		return
+	}
+	docusermember, err := atdb.GetOneDoc[model.Userdomyikado](config.Mongoconn, "user", primitive.M{"phonenumber": idprjuser.PhoneNumber})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data member tidak di temukan"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusConflict, respn)
+		return
+	}
+	_, err = atdb.AddDocToArray[model.Userdomyikado](config.Mongoconn, "project", idprjuser.ID, "member", docusermember)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Gagal menambahkan member ke project"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusExpectationFailed, respn)
+		return
+	}
+	helper.WriteJSON(respw, http.StatusOK, existingprj)
+}

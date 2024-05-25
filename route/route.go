@@ -29,6 +29,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 		controller.GetDataProject(w, r)
 	case method == "GET" && path == "/data/proyek/anggota":
 		controller.GetDataMemberProject(w, r)
+	case method == "POST" && path == "/data/proyek/anggota":
+		controller.PostDataMemberProject(w, r)
 	case method == "POST" && path == "/data/proyek":
 		controller.PostDataProject(w, r)
 	case method == "POST" && helper.URLParam(path, "/webhook/nomor/:nomorwa"):
