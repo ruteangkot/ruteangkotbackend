@@ -3,13 +3,13 @@ package model
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type PushReport struct {
-	ProjectID string `bson:"projectid" json:"projectid"`
-	Username  string `bson:"username" json:"username"`
-	Email     string `bson:"email,omitempty" json:"email,omitempty"`
-	Repo      string `bson:"repo" json:"repo"`
-	Ref       string `bson:"ref" json:"ref"`
-	Message   string `bson:"message" json:"message"`
-	Modified  string `bson:"modified,omitempty" json:"modified,omitempty"`
+	Project  Project `bson:"project" json:"project"`
+	Username string  `bson:"username" json:"username"`
+	Email    string  `bson:"email,omitempty" json:"email,omitempty"`
+	Repo     string  `bson:"repo" json:"repo"`
+	Ref      string  `bson:"ref" json:"ref"`
+	Message  string  `bson:"message" json:"message"`
+	Modified string  `bson:"modified,omitempty" json:"modified,omitempty"`
 }
 
 type Project struct {

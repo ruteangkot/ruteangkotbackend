@@ -43,6 +43,7 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 			kommsg := strings.TrimSpace(komit.Message)
 			appd := strconv.Itoa(i+1) + ". " + kommsg + "\n_" + komit.Author.Name + "_\n"
 			dokcommit := model.PushReport{
+				Project:  prj,
 				Username: komit.Author.Username,
 				Email:    komit.Author.Email,
 				Repo:     pyl.Repository.URL,
