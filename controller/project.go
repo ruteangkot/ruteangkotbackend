@@ -189,7 +189,7 @@ func PostDataMemberProject(respw http.ResponseWriter, req *http.Request) {
 		helper.WriteJSON(respw, http.StatusConflict, respn)
 		return
 	}
-	rest, err := atdb.AddDocToArray[model.Userdomyikado](config.Mongoconn, "project", idprjuser.ID, "member", docusermember)
+	rest, err := atdb.AddDocToArray[model.Userdomyikado](config.Mongoconn, "project", idprjuser.ID, "members", docusermember)
 	if err != nil {
 		respn.Status = "Error : Gagal menambahkan member ke project"
 		respn.Response = err.Error()
