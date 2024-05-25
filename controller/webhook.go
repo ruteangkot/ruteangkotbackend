@@ -44,10 +44,11 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 			kommsg := strings.TrimSpace(komit.Message)
 			appd := strconv.Itoa(i+1) + ". " + kommsg + "\n_" + komit.Author.Name + "_\n"
 			var member *model.Userdomyikado
-			member, err := getMembersByGithubUsernameInProject(prj, komit.Author.Username)
+			member, err := getMemberByAttributeInProject(prj, "githubusername", komit.Author.Username)
 			if err != nil {
-				member, err = getMembersByEmailInProject(prj, komit.Author.Email)
+				member, err = getMemberByAttributeInProject(prj, "email", komit.Author.Email)
 				if err != nil {
+					resp.Location = komit.Author.Email + " | " + komit.Author.Username
 					resp.Info = "Username dan Email di GitHub tidak terdaftar"
 					resp.Response = err.Error()
 					helper.WriteJSON(respw, http.StatusLocked, resp)
@@ -94,20 +95,19 @@ func PostWebHookGithub(respw http.ResponseWriter, req *http.Request) {
 	helper.WriteJSON(respw, http.StatusOK, resp)
 }
 
-func getMembersByEmailInProject(project model.Project, email string) (*model.Userdomyikado, error) {
+func getMemberByAttributeInProject(project model.Project, attribute string, value string) (*model.Userdomyikado, error) {
 	for _, member := range project.Members {
-		if member.Email == email {
-			return &member, nil
-		}
-	}
-	return nil, errors.New("member not found")
-
-}
-
-func getMembersByGithubUsernameInProject(project model.Project, githubusername string) (*model.Userdomyikado, error) {
-	for _, member := range project.Members {
-		if member.GithubUsername == githubusername {
-			return &member, nil
+		switch attribute {
+		case "email":
+			if member.Email == value {
+				return &member, nil
+			}
+		case "githubusername":
+			if member.GithubUsername == value {
+				return &member, nil
+			}
+		default:
+			return nil, errors.New("unknown attribute")
 		}
 	}
 	return nil, errors.New("member not found")
