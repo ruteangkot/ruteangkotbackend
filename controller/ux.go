@@ -13,6 +13,29 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+func GetLaporan(respw http.ResponseWriter, req *http.Request) {
+	id := helper.GetParam(req)
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : ObjectID Tidak Valid"
+		respn.Info = helper.GetSecretFromHeader(req)
+		respn.Location = "Encode Object ID Error"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+	hasil, err := atdb.GetOneLatestDoc[model.Laporan](config.Mongoconn, "uxlaporan", primitive.M{"_id": objectId})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data laporan tidak di temukan"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+	helper.WriteJSON(respw, http.StatusOK, hasil)
+}
+
 func PostLaporan(respw http.ResponseWriter, req *http.Request) {
 	//otorisasi dan validasi inputan
 	payload, err := watoken.Decode(config.PublicKeyWhatsAuth, helper.GetLoginFromHeader(req))
