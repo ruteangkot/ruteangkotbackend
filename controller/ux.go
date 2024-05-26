@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gocroot/config"
@@ -10,8 +11,68 @@ import (
 	"github.com/gocroot/helper/atdb"
 	"github.com/gocroot/helper/watoken"
 	"github.com/gocroot/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func PostRatingLaporan(respw http.ResponseWriter, req *http.Request) {
+	var rating model.Rating
+	err := json.NewDecoder(req.Body).Decode(&rating)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Body tidak valid"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+	objectId, err := primitive.ObjectIDFromHex(rating.ID)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : ObjectID Tidak Valid"
+		respn.Info = helper.GetSecretFromHeader(req)
+		respn.Location = "Encode Object ID Error"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusBadRequest, respn)
+		return
+	}
+	hasil, err := atdb.GetOneLatestDoc[model.Laporan](config.Mongoconn, "uxlaporan", primitive.M{"_id": objectId})
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data laporan tidak di temukan"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+	filter := bson.M{"_id": bson.M{"$eq": hasil.ID}}
+	update := bson.M{
+		"$set": bson.M{
+			"rating":   rating.Rating,
+			"komentar": rating.Komentar,
+		},
+	}
+	res, err := atdb.UpdateDoc(config.Mongoconn, "uxlaporan", filter, update)
+	if err != nil {
+		var respn model.Response
+		respn.Status = "Error : Data laporan tidak berhasil di update data rating"
+		respn.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
+		return
+	}
+	message := "*" + hasil.Petugas + "*\nsudah dinilai oleh *" + hasil.Nama + " " + hasil.Phone + "* dengan rating *" + strconv.Itoa(rating.Rating) + "* komentar:\n" + rating.Komentar
+	dt := &model.TextMessage{
+		To:       hasil.NoPetugas,
+		IsGroup:  false,
+		Messages: message,
+	}
+	resp, err := helper.PostStructWithToken[model.Response]("Token", config.WAAPIToken, dt, config.WAAPIMessage)
+	if err != nil {
+		resp.Info = "Tidak berhak"
+		resp.Response = err.Error()
+		helper.WriteJSON(respw, http.StatusUnauthorized, resp)
+		return
+	}
+	helper.WriteJSON(respw, http.StatusOK, res)
+}
 
 func GetLaporan(respw http.ResponseWriter, req *http.Request) {
 	id := helper.GetParam(req)
