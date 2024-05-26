@@ -7,7 +7,7 @@ type Laporan struct {
 	User      Userdomyikado      `json:"user,omitempty" bson:"user,omitempty"`
 	Petugas   string             `json:"petugas,omitempty" bson:"petugas,omitempty"`
 	NoPetugas string             `json:"nopetugas,omitempty" bson:"nopetugas,omitempty"`
-	Kode      string             `json:"no,omitempty" bson:"no,omitempty"`
+	Kode      string             `json:"kode,omitempty" bson:"kode,omitempty"`
 	Nama      string             `json:"nama,omitempty" bson:"nama,omitempty"`
 	Phone     string             `json:"phone,omitempty" bson:"phone,omitempty"`
 	Solusi    string             `json:"solusi,omitempty" bson:"solusi,omitempty"`
