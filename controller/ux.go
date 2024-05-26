@@ -63,7 +63,6 @@ func PostLaporan(respw http.ResponseWriter, req *http.Request) {
 		helper.WriteJSON(respw, http.StatusNotModified, respn)
 		return
 	}
-	lap.ID = idlap
 	message := "*Permintaan Feedback Pekerjaan*\n" + "Petugas : " + docuser.Name + "\nDeskripsi:" + lap.Solusi + "\n Beri Nilai: " + "https://www.do.my.id/rate/#" + idlap.Hex()
 	dt := &model.TextMessage{
 		To:       lap.Phone,
