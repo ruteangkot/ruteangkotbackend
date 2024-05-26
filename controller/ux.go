@@ -17,9 +17,9 @@ import (
 
 func PostRatingLaporan(respw http.ResponseWriter, req *http.Request) {
 	var rating model.Rating
+	var respn model.Response
 	err := json.NewDecoder(req.Body).Decode(&rating)
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : Body tidak valid"
 		respn.Response = err.Error()
 		helper.WriteJSON(respw, http.StatusBadRequest, respn)
@@ -27,7 +27,6 @@ func PostRatingLaporan(respw http.ResponseWriter, req *http.Request) {
 	}
 	objectId, err := primitive.ObjectIDFromHex(rating.ID)
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : ObjectID Tidak Valid"
 		respn.Info = helper.GetSecretFromHeader(req)
 		respn.Location = "Encode Object ID Error"
@@ -37,7 +36,6 @@ func PostRatingLaporan(respw http.ResponseWriter, req *http.Request) {
 	}
 	hasil, err := atdb.GetOneLatestDoc[model.Laporan](config.Mongoconn, "uxlaporan", primitive.M{"_id": objectId})
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : Data laporan tidak di temukan"
 		respn.Response = err.Error()
 		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
@@ -52,7 +50,6 @@ func PostRatingLaporan(respw http.ResponseWriter, req *http.Request) {
 	}
 	res, err := atdb.UpdateDoc(config.Mongoconn, "uxlaporan", filter, update)
 	if err != nil {
-		var respn model.Response
 		respn.Status = "Error : Data laporan tidak berhasil di update data rating"
 		respn.Response = err.Error()
 		helper.WriteJSON(respw, http.StatusNotImplemented, respn)
@@ -71,7 +68,9 @@ func PostRatingLaporan(respw http.ResponseWriter, req *http.Request) {
 		helper.WriteJSON(respw, http.StatusUnauthorized, resp)
 		return
 	}
-	helper.WriteJSON(respw, http.StatusOK, res)
+	respn.Response = strconv.Itoa(int(res.ModifiedCount))
+	respn.Info = hasil.Nama
+	helper.WriteJSON(respw, http.StatusOK, respn)
 }
 
 func GetLaporan(respw http.ResponseWriter, req *http.Request) {
