@@ -18,6 +18,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case method == "GET" && path == "/":
 		controller.GetHome(w, r)
+	case method == "GET" && path == "/data":
+		controller.Getdatarouteangkot(w, r)
 	default:
 		controller.NotFound(w, r)
 	}
