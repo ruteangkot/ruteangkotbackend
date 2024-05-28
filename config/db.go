@@ -11,7 +11,7 @@ var MongoString string = os.Getenv("MONGOSTRING")
 
 var mongoinfo = model.DBInfo{
 	DBString: MongoString,
-	DBName:   "domyid",
+	DBName:   "Angkutankotabdg",
 }
 
 var Mongoconn, ErrorMongoconn = helper.MongoConnect(mongoinfo)
