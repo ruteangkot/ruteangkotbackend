@@ -11,7 +11,7 @@ import (
 )
 
 func Getdatarouteangkot(respw http.ResponseWriter, req *http.Request) {
-	resp, _:= atdb.GetAllDoc[model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
+	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
 	helper.WriteJSON(respw, http.StatusOK, resp)
 	
 }
