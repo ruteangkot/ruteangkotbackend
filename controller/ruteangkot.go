@@ -15,3 +15,21 @@ func Getdatarouteangkot(respw http.ResponseWriter, req *http.Request) {
 	helper.WriteJSON(respw, http.StatusOK, resp)
 	
 }
+
+func CreateRoute(respw http.ResponseWriter, req *http.Request) {
+	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
+	helper.WriteJSON(respw, http.StatusOK, resp)
+	
+}
+
+func UpdateRoute(respw http.ResponseWriter, req *http.Request) {
+	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
+	helper.WriteJSON(respw, http.StatusOK, resp)
+	
+}
+
+func DeleteRoute(respw http.ResponseWriter, req *http.Request) {
+	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
+	helper.WriteJSON(respw, http.StatusOK, resp)
+	
+}

@@ -8,19 +8,40 @@ import (
 )
 
 func URL(w http.ResponseWriter, r *http.Request) {
-	if config.SetAccessControlHeaders(w, r) {
-		// If it's a preflight request, return early.
-		return
-	}
-	config.SetEnv()
+    if config.SetAccessControlHeaders(w, r) {
+        // If it's a preflight request, return early.
+        return
+    }
+    config.SetEnv()
 
-	var method, path string = r.Method, r.URL.Path
-	switch {
-	case method == "GET" && path == "/":
-		controller.GetHome(w, r)
-	case method == "GET" && path == "/data":
-		controller.Getdatarouteangkot(w, r)
-	default:
-		controller.NotFound(w, r)
-	}
+    switch r.Method {
+    case "GET":
+        if r.URL.Path == "/" {
+            controller.GetHome(w, r)
+        } else if r.URL.Path == "/data" {
+            controller.Getdatarouteangkot(w, r)
+        } else {
+            controller.NotFound(w, r)
+        }
+    case "POST":
+        if r.URL.Path == "/data" {
+            controller.CreateRoute(w, r)
+        } else {
+            controller.NotFound(w, r)
+        }
+    case "PUT":
+        if r.URL.Path == "/data" {
+            controller.UpdateRoute(w, r)
+        } else {
+            controller.NotFound(w, r)
+        }
+    case "DELETE":
+        if r.URL.Path == "/data" {
+            controller.DeleteRoute(w, r)
+        } else {
+            controller.NotFound(w, r)
+        }
+    default:
+        controller.NotFound(w, r)
+    }
 }
