@@ -19,8 +19,29 @@ func Getdatarouteangkot(respw http.ResponseWriter, req *http.Request) {
 }
 
 func CreateRoute(respw http.ResponseWriter, req *http.Request) {
-	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
-	helper.WriteJSON(respw, http.StatusOK, resp)
+	var rute model.RuteAngkot
+	err := json.NewDecoder(req.Body).Decode(&rute)
+	if err != nil {
+		var respn model.Response
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		
+	}
+	_, err = atdb.InsertOneDoc(config.Mongoconn,"data json",rute)
+	if err != nil {
+		var respn model.Response
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		
+	}
+	ruteangkots, err  := atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn,"data json",bson.M{})
+	if err != nil {
+		var respn model.Response
+		respn.Response = err.Error()
+		at.WriteJSON(respw, http.StatusForbidden, respn)
+		
+	}
+	helper.WriteJSON(respw, http.StatusOK, ruteangkots)
 	
 }
 
