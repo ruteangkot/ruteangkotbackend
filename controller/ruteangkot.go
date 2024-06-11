@@ -25,6 +25,7 @@ func CreateRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	_, err = atdb.InsertOneDoc(config.Mongoconn,"data json",rute)
@@ -32,6 +33,7 @@ func CreateRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	ruteangkots, err  := atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn,"data json",bson.M{})
@@ -39,6 +41,7 @@ func CreateRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	helper.WriteJSON(respw, http.StatusOK, ruteangkots)
@@ -52,6 +55,7 @@ func UpdateRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	dt, err:= atdb.GetOneDoc[model.RuteAngkot](config.Mongoconn,"data json",bson.M{"_id":rute.ID})
@@ -59,6 +63,7 @@ func UpdateRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	dt.JamOperasional = rute.JamOperasional
@@ -69,6 +74,7 @@ func UpdateRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	helper.WriteJSON(respw, http.StatusOK, dt)
@@ -82,6 +88,7 @@ func DeleteRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	err = atdb.DeleteOneDoc(config.Mongoconn,"data json",bson.M{"_id":rute.ID})
@@ -89,6 +96,7 @@ func DeleteRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	ruteangkot, err  := atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn,"data json",bson.M{"_id":rute.ID})
@@ -96,6 +104,7 @@ func DeleteRoute(respw http.ResponseWriter, req *http.Request) {
 		var respn model.Response
 		respn.Response = err.Error()
 		at.WriteJSON(respw, http.StatusForbidden, respn)
+		return
 		
 	}
 	helper.WriteJSON(respw, http.StatusOK, ruteangkot)
