@@ -8,3 +8,9 @@ type RuteAngkot struct {
 	JamOperasional string             `bson:"Jam Operasional,omitempty" json:"Jam Operasional,omitempty"`
 	Tarif          string             `bson:"Tarif,omitempty" json:"Tarif,omitempty"`
 }
+
+type Admin struct {
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Username string             `bson:"username" json:"username"`
+	Password string             `bson:"password" json:"password"`
+}

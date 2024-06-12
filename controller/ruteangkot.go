@@ -10,7 +10,36 @@ import (
 	"github.com/gocroot/helper/atdb"
 	"github.com/gocroot/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/crypto/bcrypt"
 )
+
+func Login(respw http.ResponseWriter, req *http.Request) {
+	var credentials struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	err := json.NewDecoder(req.Body).Decode(&credentials)
+	if err != nil {
+		helper.WriteJSON(respw, http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+		return
+	}
+
+	var admin model.Admin
+	admin, err = atdb.GetOneDoc[model.Admin](config.Mongoconn, "admin", bson.M{"username": credentials.Username})
+	if err != nil {
+		helper.WriteJSON(respw, http.StatusUnauthorized, map[string]string{"error": "Invalid username or password"})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(credentials.Password))
+	if err != nil {
+		helper.WriteJSON(respw, http.StatusUnauthorized, map[string]string{"error": "Invalid username or password"})
+		return
+	}
+
+	helper.WriteJSON(respw, http.StatusOK, map[string]string{"message": "Login successful"})
+}
 
 func Getdatarouteangkot(respw http.ResponseWriter, req *http.Request) {
 	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
