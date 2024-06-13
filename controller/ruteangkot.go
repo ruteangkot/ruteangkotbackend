@@ -18,6 +18,7 @@ func Login(respw http.ResponseWriter, req *http.Request) {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
+	
 
 	err := json.NewDecoder(req.Body).Decode(&credentials)
 	if err != nil {
@@ -34,7 +35,7 @@ func Login(respw http.ResponseWriter, req *http.Request) {
 
 	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(credentials.Password))
 	if err != nil {
-		helper.WriteJSON(respw, http.StatusUnauthorized, map[string]string{"error": "Invalid username or password"})
+		helper.WriteJSON(respw, http.StatusUnauthorized, map[string]string{"error": "bro berpikir passwordnya benar, salah itu!"})
 		return
 	}
 
