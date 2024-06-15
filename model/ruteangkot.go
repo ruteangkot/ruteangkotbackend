@@ -14,8 +14,3 @@ type Admin struct {
 	Username string             `bson:"username" json:"username"`
 	Password string             `bson:"password" json:"password"`
 }
-type User struct {
-    Username string `json:"username"`
-    Email    string `json:"email"`
-    Password string `json:"password"`
-}
