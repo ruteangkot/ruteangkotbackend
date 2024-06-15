@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/gocroot/model"
 	"github.com/gocroot/route"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
@@ -27,7 +28,7 @@ func init() {
 }
 
 func registerUser(w http.ResponseWriter, r *http.Request) {
-    var user mgo.User
+    var user model.User
     err := json.NewDecoder(r.Body).Decode(&user)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
@@ -41,7 +42,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Printf("New user registered: %+v", user) // Logging data yang disimpan
+    log.Printf("New user registered: %+v", user)
 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("User registered successfully!"))
@@ -51,6 +52,6 @@ func main() {
     router := mux.NewRouter()
     router.HandleFunc("/register", registerUser).Methods("POST")
 
-    log.Println("Server started at :3000")
-    log.Fatal(http.ListenAndServe(":3000", router))
+    log.Println("Server started at :8080")
+    log.Fatal(http.ListenAndServe(":8080", router))
 }
