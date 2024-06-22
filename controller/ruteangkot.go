@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gocroot/config"
 	"github.com/gocroot/helper"
 	"github.com/gocroot/helper/at"
@@ -13,33 +16,73 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Login(respw http.ResponseWriter, req *http.Request) {
-	var credentials struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	
+var validate = validator.New()
 
-	err := json.NewDecoder(req.Body).Decode(&credentials)
-	if err != nil {
-		helper.WriteJSON(respw, http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+// Register function handles user registration
+func Register(w http.ResponseWriter, r *http.Request) {
+	var user model.User
+	_ = json.NewDecoder(r.Body).Decode(&user)
+
+	// Validate the request body
+	if err := validate.Struct(user); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var admin model.Admin
-	admin, err = atdb.GetOneDoc[model.Admin](config.Mongoconn, "admin", bson.M{"username": credentials.Username})
-	if err != nil {
-		helper.WriteJSON(respw, http.StatusUnauthorized, map[string]string{"error": "Invalid username or password"})
+	// Check if user already exists
+	collection := config.Mongoconn.Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var existingUser model.User
+	err := collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&existingUser)
+	if err == nil {
+		http.Error(w, "Email already exists", http.StatusConflict)
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(credentials.Password))
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		helper.WriteJSON(respw, http.StatusUnauthorized, map[string]string{"error": "bro berpikir passwordnya benar, salah itu!"})
+		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+		return
+	}
+	user.Password = string(hashedPassword)
+
+	// Insert the user into MongoDB
+	_, err = collection.InsertOne(ctx, user)
+	if err != nil {
+		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
 
-	helper.WriteJSON(respw, http.StatusOK, map[string]string{"message": "Login successful"})
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(user)
+}
+func Login(w http.ResponseWriter, r *http.Request) {
+	var input model.User
+	_ = json.NewDecoder(r.Body).Decode(&input)
+
+	// Find the user in the database
+	collection := config.Mongoconn.Collection("users")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var user model.User
+	err := collection.FindOne(ctx, bson.M{"email": input.Email}).Decode(&user)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+
+	// Compare passwords
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
 }
 
 func Getdatarouteangkot(respw http.ResponseWriter, req *http.Request) {
