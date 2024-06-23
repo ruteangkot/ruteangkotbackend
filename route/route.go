@@ -26,8 +26,6 @@ func URL(w http.ResponseWriter, r *http.Request) {
     case "POST":
         if r.URL.Path == "/data" {
             controller.CreateRoute(w, r)
-        } else if r.URL.Path == "/login" {
-            controller.Login(w, r)
         } else {
             controller.NotFound(w, r)
         }
