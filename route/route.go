@@ -8,37 +8,43 @@ import (
 )
 
 func URL(w http.ResponseWriter, r *http.Request) {
+	// Set Access Control Headers
 	if config.SetAccessControlHeaders(w, r) {
 		return
 	}
+	
+	
 	config.SetEnv()
 
+
 	switch r.Method {
-	case "GET":
-		if r.URL.Path == "/" {
+	case http.MethodGet:
+		switch r.URL.Path {
+		case "/":
 			controller.GetHome(w, r)
-		} else if r.URL.Path == "/data" {
+		case "/data":
 			controller.Getdatarouteangkot(w, r)
-		} else {
+		default:
 			controller.NotFound(w, r)
 		}
-	case "POST":
-		if r.URL.Path == "/data" {
+	case http.MethodPost:
+		switch r.URL.Path {
+		case "/data":
 			controller.CreateRoute(w, r)
-		} else if r.URL.Path == "/register" {
+		case "/register":
 			controller.Register(w, r)
-		} else if r.URL.Path == "/login" {
+		case "/login":
 			controller.Login(w, r)
-		} else {
+		default:
 			controller.NotFound(w, r)
 		}
-	case "PUT":
+	case http.MethodPut:
 		if r.URL.Path == "/data" {
 			controller.UpdateRoute(w, r)
 		} else {
 			controller.NotFound(w, r)
 		}
-	case "DELETE":
+	case http.MethodDelete:
 		if r.URL.Path == "/data" {
 			controller.DeleteRoute(w, r)
 		} else {

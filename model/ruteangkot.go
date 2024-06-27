@@ -18,6 +18,12 @@ type Admin struct {
 }
 type User struct {
 	ID       primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Username string             `json:"username" bson:"username"`
-	Password string             `json:"password" bson:"password"`
+	Username string             `json:"username,omitempty" bson:"username,omitempty"`
+	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
+	Password string             `json:"password,omitempty" bson:"password,omitempty"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

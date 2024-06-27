@@ -43,31 +43,33 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	var credentials model.User
-	_ = json.NewDecoder(r.Body).Decode(&credentials)
+	var loginRequest model.LoginRequest
+	_ = json.NewDecoder(r.Body).Decode(&loginRequest)
 
 	collection := config.DB.Collection("users")
 	var user model.User
-	err := collection.FindOne(context.Background(), bson.M{"username": credentials.Username}).Decode(&user)
+	err := collection.FindOne(context.Background(), bson.M{"email": loginRequest.Email}).Decode(&user)
 	if err != nil {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Login successful")
+	json.NewEncoder(w).Encode(user)
 }
+
 func Getdatarouteangkot(respw http.ResponseWriter, req *http.Request) {
 	resp, _:= atdb.GetAllDoc[[]model.RuteAngkot](config.Mongoconn, "data json", bson.M{})
 	helper.WriteJSON(respw, http.StatusOK, resp)
