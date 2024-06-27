@@ -1,7 +1,6 @@
 package route
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gocroot/config"
@@ -9,14 +8,11 @@ import (
 )
 
 func URL(w http.ResponseWriter, r *http.Request) {
-	// Log request method and URL path
-	fmt.Printf("Received %s request for %s\n", r.Method, r.URL.Path)
-	
 	// Set Access Control Headers
 	if config.SetAccessControlHeaders(w, r) {
 		return
 	}
-
+	
 	config.SetEnv()
 
 	switch r.Method {
@@ -30,14 +26,13 @@ func URL(w http.ResponseWriter, r *http.Request) {
 			controller.NotFound(w, r)
 		}
 	case http.MethodPost:
-		if r.URL.Path == "/akun"{
-			controller.Register(w, r)
-		} else {
-			controller.Login(w, r)
-		}
-		switch r.URL.Path  {
+		switch r.URL.Path {
 		case "/data":
 			controller.CreateRoute(w, r)
+		case "/register":
+			controller.Register(w, r)
+		case "/login":
+			controller.Login(w, r)
 		default:
 			controller.NotFound(w, r)
 		}
@@ -56,22 +51,4 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	default:
 		controller.NotFound(w, r)
 	}
-}
-
-func SetAccessControlHeaders(w http.ResponseWriter, r *http.Request) bool {
-	// Set CORS headers for the preflight request
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Login")
-		w.Header().Set("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE")
-		w.Header().Set("Access-Control-Allow-Origin", "https://ruteangkot.github.io")
-		w.Header().Set("Access-Control-Max-Age", "3600")
-		w.WriteHeader(http.StatusNoContent)
-		return true
-	}
-	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Origin", "https://ruteangkot.github.io")
-	w.Header().Set("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE")
-	return false
 }
