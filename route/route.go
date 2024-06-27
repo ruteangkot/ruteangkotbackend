@@ -30,13 +30,14 @@ func URL(w http.ResponseWriter, r *http.Request) {
 			controller.NotFound(w, r)
 		}
 	case http.MethodPost:
-		switch r.URL.Path {
+		if r.URL.Path == "/akun"{
+			controller.Register(w, r)
+		} else {
+			controller.Login(w, r)
+		}
+		switch r.URL.Path  {
 		case "/data":
 			controller.CreateRoute(w, r)
-		case "/register":
-			controller.Register(w, r)
-		case "/login":
-			controller.Login(w, r)
 		default:
 			controller.NotFound(w, r)
 		}
