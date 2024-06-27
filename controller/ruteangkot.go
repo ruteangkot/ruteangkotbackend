@@ -65,8 +65,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Generate JWT token and send it to the user
-
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Login successful")
 }

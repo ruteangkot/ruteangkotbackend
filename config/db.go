@@ -23,8 +23,9 @@ var Mongoconn, ErrorMongoconn = helper.MongoConnect(mongoinfo)
 
 var DB *mongo.Database
 
-func ConnectDB() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://Angkutankotabdg:naikangkot001@cluster02.hqmgzeb.mongodb.net/"))
+func InitDB() {
+	clientOptions := options.Client().ApplyURI("mongodb+srv://Angkutankotabdg:naikangkot001@cluster02.hqmgzeb.mongodb.net/")
+	client, err := mongo.NewClient(clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,6 +38,5 @@ func ConnectDB() {
 		log.Fatal(err)
 	}
 
-	DB = client.Database("userDB")
-	log.Println("Connected to MongoDB!")
+	DB = client.Database("Angkutankotabdg")
 }
