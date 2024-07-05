@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gocroot/config"
 	"github.com/gocroot/helper"
@@ -12,9 +13,82 @@ import (
 	"github.com/gocroot/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
+func RequestResetPassword(w http.ResponseWriter, r *http.Request) {
+	var requestData struct {
+		Email string `json:"email"`
+	}
 
+	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+		helper.JSON(w, http.StatusBadRequest, helper.Message("Invalid request body"))
+		return
+	}
+
+	resetToken := helper.GenerateResetToken()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	collection := config.DB.Collection("users")
+	filter := bson.M{"email": requestData.Email}
+	update := bson.M{"$set": bson.M{"resetToken": resetToken, "resetTokenExpiry": time.Now().Add(1 * time.Hour)}}
+
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	var updatedUser model.User
+	err := collection.FindOneAndUpdate(ctx, filter, update, opts).Decode(&updatedUser)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			helper.JSON(w, http.StatusNotFound, helper.Message("Email not found"))
+			return
+		}
+		helper.JSON(w, http.StatusInternalServerError, helper.Message("Failed to update user"))
+		return
+	}
+
+	if err := helper.SendResetPasswordEmail(updatedUser.Email, resetToken); err != nil {
+		helper.JSON(w, http.StatusInternalServerError, helper.Message("Failed to send email"))
+		return
+	}
+
+	helper.JSON(w, http.StatusOK, helper.Message("Reset password email sent"))
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var requestData struct {
+		Token    string `json:"token"`
+		Password string `json:"password"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+		helper.JSON(w, http.StatusBadRequest, helper.Message("Invalid request body"))
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(requestData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		helper.JSON(w, http.StatusInternalServerError, helper.Message("Failed to hash password"))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	collection := config.DB.Collection("users")
+	filter := bson.M{"resetToken": requestData.Token, "resetTokenExpiry": bson.M{"$gt": time.Now()}}
+	update := bson.M{"$set": bson.M{"password": string(hashedPassword)}, "$unset": bson.M{"resetToken": "", "resetTokenExpiry": ""}}
+
+	result, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil || result.ModifiedCount == 0 {
+		helper.JSON(w, http.StatusBadRequest, helper.Message("Invalid or expired token"))
+		return
+	}
+
+	helper.JSON(w, http.StatusOK, helper.Message("Password reset successfully"))
+}
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
