@@ -23,15 +23,11 @@ type User struct {
 	Username string             `json:"username,omitempty" bson:"username,omitempty"`
 	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
 	Password string             `json:"password,omitempty" bson:"password,omitempty"`
+	ResetToken       string             `json:"resetToken,omitempty" bson:"resetToken,omitempty"`
+	ResetTokenExpiry time.Time          `json:"resetTokenExpiry,omitempty" bson:"resetTokenExpiry,omitempty"`
 }
 
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-type ResetPassword struct {
-    ID               primitive.ObjectID `bson:"_id,omitempty"`
-    Email            string             `bson:"email"`
-    ResetToken       string             `bson:"resetToken"`
-    ResetTokenExpiry time.Time          `bson:"resetTokenExpiry"`
 }

@@ -39,4 +39,5 @@ func InitDB() {
 	}
 
 	DB = client.Database("Angkutankotabdg")
+	log.Println("Connected to MongoDB!")
 }

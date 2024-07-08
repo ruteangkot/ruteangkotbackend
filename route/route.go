@@ -12,7 +12,7 @@ func URL(w http.ResponseWriter, r *http.Request) {
 	if config.SetAccessControlHeaders(w, r) {
 		return
 	}
-	
+
 	config.SetEnv()
 
 	switch r.Method {
@@ -33,6 +33,8 @@ func URL(w http.ResponseWriter, r *http.Request) {
 			controller.Register(w, r)
 		case "/login":
 			controller.Login(w, r)
+		case "/reset-password":
+			controller.ResetPassword(w, r)
 		default:
 			controller.NotFound(w, r)
 		}
