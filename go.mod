@@ -5,10 +5,9 @@ go 1.22.3
 require (
 	aidanwoods.dev/go-paseto v1.5.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	
 	go.mongodb.org/mongo-driver v1.15.0
 	golang.org/x/crypto v0.23.0
-	
+
 )
 
 require (
