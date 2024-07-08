@@ -14,7 +14,3 @@ func init() {
 	config.InitDB()
 	functions.HTTP("WebHook", route.URL)
 }
-func main() {
-	http.HandleFunc("/request-reset-password", controller.RequestResetPassword)
-	http.HandleFunc("/reset-password", controller.ResetPassword)
-}
