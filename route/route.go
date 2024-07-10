@@ -33,8 +33,6 @@ func URL(w http.ResponseWriter, r *http.Request) {
 			controller.Register(w, r)
 		case "/login":
 			controller.Login(w, r)
-		case "/reset-password":
-			controller.ResetPassword(w, r)
 		default:
 			controller.NotFound(w, r)
 		}

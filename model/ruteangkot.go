@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -23,8 +21,6 @@ type User struct {
 	Username string             `json:"username,omitempty" bson:"username,omitempty"`
 	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
 	Password string             `json:"password,omitempty" bson:"password,omitempty"`
-	ResetToken       string             `json:"resetToken,omitempty" bson:"resetToken,omitempty"`
-	ResetTokenExpiry time.Time          `json:"resetTokenExpiry,omitempty" bson:"resetTokenExpiry,omitempty"`
 }
 
 type LoginRequest struct {
