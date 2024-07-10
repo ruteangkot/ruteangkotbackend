@@ -59,8 +59,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Send reset email with the token to the user
-	// sendResetEmail(email, resetToken)
+	
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
