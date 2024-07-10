@@ -2,11 +2,8 @@ package controller
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/gocroot/config"
 	"github.com/gocroot/helper"
@@ -15,56 +12,9 @@ import (
 	"github.com/gocroot/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
-func generateResetToken() (string, error) {
-    b := make([]byte, 16)
-    _, err := rand.Read(b)
-    if err != nil {
-        return "", err
-    }
-    return hex.EncodeToString(b), nil
-}
 
-func ResetPassword(w http.ResponseWriter, r *http.Request) {
-	email := r.FormValue("email")
-
-	// Generate reset token
-	resetToken, err := generateResetToken()
-	if err != nil {
-		http.Error(w, "Failed to generate reset token", http.StatusInternalServerError)
-		return
-	}
-
-	resetTokenExpiry := time.Now().Add(1 * time.Hour)
-
-	// Update user in database
-	collection := config.DB.Collection("users")
-	filter := bson.M{"email": email}
-	update := bson.M{
-		"$set": bson.M{
-			"resetToken":       resetToken,
-			"resetTokenExpiry": resetTokenExpiry,
-		},
-	}
-
-	_, err = collection.UpdateOne(context.Background(), filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			http.Error(w, "User not found", http.StatusNotFound)
-		} else {
-			http.Error(w, "Failed to update user", http.StatusInternalServerError)
-		}
-		return
-	}
-
-	
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message":"Reset token sent to your email"}`))
-}
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
